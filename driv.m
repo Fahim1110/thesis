@@ -55,12 +55,44 @@ a_mean = (sum(a_buffer)/train);
 
 a = a_mean;
 
+a1 = a;
+sc = false;
+ft = 10;
 %a = 0.005;
 
 for t = train+1 : length(frames)
     s = fullfile(frames(t).folder, frames(t).name);
     videoFrame = imread(s);
     videoFrame = toSize(videoFrame);
+    
+    % Check Sudden change
+    
+    if sc == false
+        sc = SuddenChange(videoFrame, p_frame);
+        if sc == true
+            disp('change');
+            c = 1;
+        end
+    end
+    if (sc == true && c <= ft + 1)
+        if (c == 1)
+            a = 1;
+        else
+        a = (((1 - a1) / ft) * (ft - (c - 1)) + a1);
+        end
+        c = c + 1;
+        disp(a);
+        disp(c);
+    else
+        sc = false;
+        a = a1;
+        disp(a);
+    end
+    
+    p_frame = videoFrame;
+    
+    % End check sudden change
+    
     FrameProcess(videoFrame);
     imshow(fg_mask);
     %imshow(doubleToInt(fg));
